@@ -1,0 +1,8 @@
+services:
+  mqtt_builder:
+    container_name: mqtt_builder
+    image: mqtt_builder
+    build: .
+    command: "make -C app -f target.mk -j8"
+    volumes:
+      - ./:/app
