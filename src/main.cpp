@@ -1,25 +1,21 @@
-#include "mqtt/client.h"
+#include "mqtt_wrapper.h"
+#include "publisher.h"
+#include "subscriber.h"
 
-#include <vector>
+static MqttWrapper client("example_client");
+
+void echo(const char* msg)
+{
+    Publisher pub(client, "echo");
+    pub.send(msg);
+}
 
 int main()
 {
-    mqtt::client client("localhost", "example_client");
     client.connect();
-
-    const std::vector<std::string> TOPICS = {
-        "test",
-    };
-    client.subscribe(TOPICS);
-
+    Subscriber sub(client, "test", echo);
     while (true) {
-        auto rx_msg = client.consume_message();
-        if (rx_msg && rx_msg->get_topic() == "test") {
-            const char* topic = "echo";
-            auto tx_msg = mqtt::make_message(topic, rx_msg->to_string());
-            tx_msg->set_qos(1);
-            client.publish(tx_msg);
-        }
+        client.spin_once();
     }
     return 0;
 }
