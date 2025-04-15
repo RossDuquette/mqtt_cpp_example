@@ -6,3 +6,10 @@ services:
     command: "make -C app -f target.mk -j8"
     volumes:
       - ./:/app
+  mqtt_echo:
+    container_name: mqtt_echo
+    image: mqtt_builder
+    build: .
+    command: "/app/bin/echo"
+    volumes:
+      - ./:/app
