@@ -4,7 +4,7 @@ DEBUG ?= n
 VERBOSE ?= n
 
 SRC_DIR = ./src
-OBJ_DIR = ./obj
+OBJ_DIR = $(BIN_DIR)/.obj
 
 SRCS += $(shell find $(SRC_DIR) -name "*.cpp")
 
