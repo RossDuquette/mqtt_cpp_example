@@ -13,3 +13,4 @@ services:
     command: "/app/bin/echo"
     volumes:
       - ./:/app
+    network_mode: host
