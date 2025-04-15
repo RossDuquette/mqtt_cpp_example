@@ -2,20 +2,18 @@
 #include "publisher.h"
 #include "subscriber.h"
 
-static MqttWrapper client("example_client");
-
 void echo(const char* msg)
 {
-    Publisher pub(client, "echo");
+    Publisher pub("echo");
     pub.send(msg);
 }
 
 int main()
 {
-    client.connect();
-    Subscriber sub(client, "test", echo);
+    MqttWrapper::init("example_client");
+    Subscriber sub("test", echo);
     while (true) {
-        client.spin_once();
+        MqttWrapper::spin_once();
     }
     return 0;
 }

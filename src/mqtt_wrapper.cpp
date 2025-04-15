@@ -1,19 +1,23 @@
 #include "mqtt_wrapper.h"
 
-MqttWrapper::MqttWrapper(const char* app_name) :
-    mqtt::client("localhost", app_name),
-    callbacks()
+MqttWrapper* MqttWrapper::instance = nullptr;
+std::map<const char*, std::function<void(const char*)>> MqttWrapper::callbacks = {};
+
+void MqttWrapper::init(const char* app_name)
 {
+    if (!instance) {
+        instance = new MqttWrapper(app_name);
+    }
 }
 
-void MqttWrapper::register_callback(const char* topic, std::function<void(const char*)> cb)
+mqtt::client& MqttWrapper::get_client()
 {
-    callbacks[topic] = cb;
+    return *instance;
 }
 
 void MqttWrapper::spin_once()
 {
-    auto msg = consume_message();
+    auto msg = get_client().consume_message();
     if (msg) {
           for (auto it = callbacks.begin(); it != callbacks.end(); it++) {
               if (msg->get_topic() == it->first) {
@@ -21,4 +25,15 @@ void MqttWrapper::spin_once()
               }
           }
     }
+}
+
+void MqttWrapper::register_callback(const char* topic, std::function<void(const char*)> cb)
+{
+    callbacks[topic] = cb;
+}
+
+MqttWrapper::MqttWrapper(const char* app_name) :
+    mqtt::client("localhost", app_name)
+{
+    connect();
 }
